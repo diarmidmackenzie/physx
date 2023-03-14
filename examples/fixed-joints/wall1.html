@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/physx@more-examples/dist/physx.min.js"></script>
+      <script src="../../components/bricks/index.js"></script>
+      <script src="./brick-wall.js"></script>
+      <link rel="stylesheet" href="../../styles.css">
+  </head>
+  <body>
+    <div class="text-overlay">
+        <p>Wall of bricks connected together with fixed joints above & below.</p>
+        <p>Above 8 layers of brick (varies depending on brick height) the wall starts to bend.</p>
+    </div>
+        <a class="code-link"
+        target="_blank"
+        href="https://github.com/diarmidmackenzie/aframe-components/blob/main/component-usage/bricks.html">
+        view code
+    </a>
+      <a-scene background="color:#88f" stats
+               physx="autoLoad: true; delay: 1000; useDefaultScene: false; stats: panel">
+        <a-entity position = "0 0 -3" brick-wall>
+            <a-box id="base" physx-body = "type: static" depth="10" width="10" height="0.3" color="#4B9F4A" position="0 0 0">
+            </a-box>
+        </a-entity>
+      </a-scene>
+  </body>
+</html>
+
+
+
