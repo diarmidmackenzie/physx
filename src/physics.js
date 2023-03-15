@@ -11,7 +11,7 @@
 // and then via: https://github.com/diarmidmackenzie/christmas-scene/blob/a94ae7e7167937f10d34df8429fb71641e343bb1/lib/physics.js
 // ======================================================================
 
-let PHYSX = require('./physx.release.js');
+let PHYSX = require('./physx-js-webidl.js');
 
 // patching in Pool functions
 var poolSize = 0
@@ -329,7 +329,7 @@ AFRAME.registerSystem('physx', {
     speed: {default: 1.0},
 
     // URL for the PhysX WASM bundle.
-    wasmUrl: {default: "https://cdn.jsdelivr.net/gh/c-frame/physx/wasm/physx.release.wasm"},
+    wasmUrl: {default: "./wasm/physx-js-webidl.wasm"},
 
     // If true, sets up a default scene with a ground plane and bounding
     // cylinder.
@@ -460,23 +460,27 @@ AFRAME.registerSystem('physx', {
   async startPhysX() {
     this.running = true;
     let self = this;
-    let resolveInitialized;
-    let initialized = new Promise((r, e) => resolveInitialized = r)
-    PhysX = PHYSX({
-        locateFile() {
-            return self.findWasm()
-        },
-        onRuntimeInitialized() {
-          resolveInitialized();
-        }
-      });
+    //let resolveInitialized;
+    //let initialized = new Promise((r, e) => resolveInitialized = r)
+    PhysX = PHYSX()
     if (PhysX instanceof Promise) PhysX = await PhysX;
     this.PhysX = PhysX;
-    await initialized;
+
+    // match pre-IDL API.
+    PhysX.PX_PHYSICS_VERSION = PhysX.PxTopLevelFunctions.prototype.get_PHYSICS_VERSION()
+
+    Object.entries(PhysX.PxTopLevelFunctions.prototype).forEach(([key, func]) => {
+      const name = "Px" + key
+      PhysX[name] = func
+    })
+
+    //await initialized;
     self.startPhysXScene()
     self.physXInitialized = true
     self.fulfillPhysXPromise()
     self.el.emit('physx-started', {})
+
+    
   },
   startPhysXScene() {
     console.info("Starting PhysX scene")
@@ -486,7 +490,7 @@ AFRAME.registerSystem('physx', {
       new PhysX.PxDefaultErrorCallback()
     );
     this.foundation = foundation
-    const physxSimulationCallbackInstance = PhysX.PxSimulationEventCallback.implement({
+    const physxSimulationCallbackInstance = PhysX.PxSimulationEventCallbackImpl({
       onContactBegin: (shape0, shape1, points, impulses) => {
         let c0 = this.shapeMap.get(shape0.$$.ptr)
         let c1 = this.shapeMap.get(shape1.$$.ptr)
@@ -564,19 +568,22 @@ AFRAME.registerSystem('physx', {
       new PhysX.PxCookingParams(tolerance)
     )
 
-    const sceneDesc = PhysX.getDefaultSceneDesc(
+    const sceneDesc = new PhysX.PxSceneDesc(
       this.physics.getTolerancesScale(),
       0,
       physxSimulationCallbackInstance
     )
+    sceneDesc.set_cpuDispatcher(PhysX.PxTopLevelFunctions.prototype.DefaultCpuDispatcherCreate(0));
+    sceneDesc.set_filterShader(PhysX.PxTopLevelFunctions.prototype.DefaultFilterShader());
+
     this.scene = this.physics.createScene(sceneDesc)
 
     this.setupDefaultEnvironment()
   },
   setupDefaultEnvironment() {
     this.defaultActorFlags = new PhysX.PxShapeFlags(
-      PhysX.PxShapeFlag.eSCENE_QUERY_SHAPE.value |
-        PhysX.PxShapeFlag.eSIMULATION_SHAPE.value
+      PhysX._emscripten_enum_PxShapeFlagEnum_eSCENE_QUERY_SHAPE() |
+      PhysX._emscripten_enum_PxShapeFlagEnum_eSIMULATION_SHAPE()
     )
     this.defaultFilterData = new PhysX.PxFilterData(PhysXUtil.layersToMask(this.data.groundCollisionLayers), PhysXUtil.layersToMask(this.data.groundCollisionMask), 0, 0);
 
