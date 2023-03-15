@@ -492,8 +492,8 @@ AFRAME.registerSystem('physx', {
     this.foundation = foundation
     const physxSimulationCallbackInstance = PhysX.PxSimulationEventCallbackImpl({
       onContactBegin: (shape0, shape1, points, impulses) => {
-        let c0 = this.shapeMap.get(shape0.$$.ptr)
-        let c1 = this.shapeMap.get(shape1.$$.ptr)
+        let c0 = this.shapeMap.get(shape0.ptr)
+        let c1 = this.shapeMap.get(shape1.ptr)
 
         if (c1 === c0) return;
 
@@ -516,8 +516,8 @@ AFRAME.registerSystem('physx', {
         }
       },
       onContactEnd: (shape0, shape1) => {
-          let c0 = this.shapeMap.get(shape0.$$.ptr)
-          let c1 = this.shapeMap.get(shape1.$$.ptr)
+          let c0 = this.shapeMap.get(shape0.ptr)
+          let c1 = this.shapeMap.get(shape1.ptr)
 
           if (c1 === c0) return;
 
@@ -543,7 +543,7 @@ AFRAME.registerSystem('physx', {
       onTriggerBegin: () => {},
       onTriggerEnd: () => {},
       onConstraintBreak: (joint) => {
-        let component = this.jointMap.get(joint.$$.ptr);
+        let component = this.jointMap.get(joint.ptr);
 
         if (!component) return;
 
@@ -661,7 +661,7 @@ AFRAME.registerSystem('physx', {
           z: quat.z,
         },
       }
-      this.boundaryShapes.add(shape.$$.ptr)
+      this.boundaryShapes.add(shape.ptr)
       let body = this.physics.createRigidStatic(transform)
       body.attachShape(shape)
       this.scene.addActor(body, null)
@@ -688,7 +688,7 @@ AFRAME.registerSystem('physx', {
 
     let attemptToUseDensity = true;
     let seenAnyDensity = false;
-    let densities = new PhysX.VectorPxReal()
+    let densities = new PhysX.Vector_PxReal()
     for (let shape of component.createShapes(this.physics, this.defaultActorFlags))
     {
       body.attachShape(shape)
@@ -715,19 +715,20 @@ AFRAME.registerSystem('physx', {
         body.updateMassAndInertia(densities)
       }
       else {
-        body.setMassAndUpdateInertia(component.data.mass)
+        body.setMass(component.data.mass)
+        body.setMassSpaceInertiaTensor()
       }
     }
-    densities.delete()
+    // densities.delete() !! I don't yet know how to do this with webidl PhysX
     this.scene.addActor(body, null)
     this.objects.set(component.el.object3D, body)
     component.rigidBody = body
   },
   registerShape(shape, component) {
-    this.shapeMap.set(shape.$$.ptr, component);
+    this.shapeMap.set(shape.ptr, component);
   },
   registerJoint(joint, component) {
-    this.jointMap.set(joint.$$.ptr, component);
+    this.jointMap.set(joint.ptr, component);
   },
   removeBody(component) {
     let body = component.rigidBody
@@ -991,7 +992,7 @@ AFRAME.registerComponent('physx-body', {
 
         let attemptToUseDensity = true;
         let seenAnyDensity = false;
-        let densities = new PhysX.VectorPxReal()
+        let densities = new PhysX.Vector_PxReal()
         let component = this
         let type = this.data.type
         let body = this.rigidBody
