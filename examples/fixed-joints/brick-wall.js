@@ -5,6 +5,8 @@ AFRAME.registerComponent('brick-wall', {
   schema: {
     width: {default: 10},
     height: {default: 8},
+    projection: {default: false},
+    projectionTolerance: {type: 'vec2', default: {x: -1, y: -1}},
   },  
   init() {
 
@@ -25,7 +27,6 @@ AFRAME.registerComponent('brick-wall', {
 
     const offset = (ii % 2) /2
     const x = (jj + offset - (this.data.width / 2)) * BRICK_WIDTH
-
     const id = `brick-${ii}-${jj}`
     const brick = this.createBrick(x, y, 0, id)
 
@@ -94,7 +95,8 @@ AFRAME.registerComponent('brick-wall', {
     joint.setAttribute('physx-joint', {type: "Fixed",
                                         target: `#${targetId}`,
                                         collideWithTarget: true,
-                                        /*breakForce: {x: -1, y: -1}*/})
+                                        enableProjection: this.data.projection,
+                                        projectionTolerance: this.data.projectionTolerance})
     brick.appendChild(joint)
   }
 })

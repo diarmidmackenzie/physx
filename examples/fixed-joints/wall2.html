@@ -19,7 +19,7 @@
     </a>
       <a-scene background="color:#88f" stats
                physx="autoLoad: true; delay: 1000; useDefaultScene: false; stats: panel">
-        <a-entity position = "0 0 -3" brick-wall>
+        <a-entity position = "0 0 -3" brick-wall="projection: true; projectionTolerance: 0.001 0.0001">
             <a-box id="base" physx-body = "type: static" depth="10" width="10" height="0.3" color="#4B9F4A" position="0 0 0">
             </a-box>
         </a-entity>
