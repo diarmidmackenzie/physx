@@ -715,6 +715,7 @@ AFRAME.registerSystem('physx', {
     this.scene.addActor(body, null)
     this.objects.set(component.el.object3D, body)
     component.rigidBody = body
+    component.el.emit('rigidBodyReady')
   },
   registerShape(shape, component) {
     this.shapeMap.set(shape.$$.ptr, component);

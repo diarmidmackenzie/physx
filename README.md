@@ -187,7 +187,11 @@ Note, in such cases that if you are setting material properties on individual sh
 
 ------
 
+### physx-body Events
 
+| Event          | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| rigidBodyReady | When physx-body is set on an entity, the physx body is created asynchronously.  This event is emitted when the rigidBody is ready.  Adjustments to the rigidBody (e.g. to set a velocity on a body as it is spawned) can be executed once this event is emitted, but not before (as there is no rigidBody to act upon) |
 
 ## Component `physx-joint-driver` 
 
