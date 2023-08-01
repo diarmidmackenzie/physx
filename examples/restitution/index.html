@@ -10,6 +10,26 @@
     <script src="../../dist/physx.js"></script>
 
     <link rel="stylesheet" href="../../styles.css">
+    <script>
+      
+      AFRAME.registerComponent('collision-logger', {
+        init() {
+          this.el.addEventListener('contactbegin', (e) => {
+            console.log(e)
+
+            const impulses = e.detail.impulses
+            const points = e.detail.points
+
+            for (let i = 0; i < impulses.size(); ++i)
+            {
+              const impulse = impulses.get(i)
+              const point = points.get(i);
+              console.log("Impulse: ", i, impulse, point.x, point.y, point.z)
+            }
+          })
+        },
+      })
+    </script>
   </head>
   <body>
     <div class="text-overlay">
@@ -37,7 +57,8 @@
           <!-- restitution = 1 actually ends up adding energey to system.
                0.965 seems about right for keeping energy stable
                No idea why the discrepancy -->
-          <a-sphere radius="0.25" position="0 4 0" color="red" physx-body
+          <a-sphere radius="0.25" position="0 4 0" color="red" physx-body="emitCollisionEvents: true; highPrecision: true"
+               collision-logger
                physx-material="staticFriction: 0; dynamicFriction: 0; restitution: 0.965">
           </a-sphere>
         </script>
@@ -59,7 +80,7 @@
       </a-entity>
       <a-entity rotation="-85 90 0" position="0 1 -6" template="src: #chuteTemplate">
       </a-entity>
-      <a-entity rotation="-88 90 0" position="0 1 -4" template="src: #chuteTemplate">
+      <a-entity rotation="-87 90 0" position="0 1 -4" template="src: #chuteTemplate">
       </a-entity>
       <a-entity rotation="-89 90 0" position="0 1 -2" template="src: #chuteTemplate">
       </a-entity>
