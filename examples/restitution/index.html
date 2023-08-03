@@ -36,6 +36,7 @@
       <p>Bounce simulation with restitution (bounciness) of 1 using the PhysX driver.</p>
       <p>Issue observed with a minimum impact level needed to generate any rebound.
          The closest 2 x balls both become stationary rather than bouncing back.</p>
+      <p>Workaround is to reduce speed by 100x and increase gravity by 10,000x.</p>
     </div>
         <a class="code-link"
         target="_blank"
@@ -44,12 +45,12 @@
     </a>
     <a-scene stats="true"
              environment
-             physx="autoLoad: true; delay: 1000; useDefaultScene: false">
+             physx="autoLoad: true; delay: 1000; useDefaultScene: false; speed: 0.01; gravity: 0 -98100 0">
 
         <a-assets>
         <script id="chuteTemplate" type="text/html">
           <a-box position="0 2.5 -0.3" width="1" height="5" depth="0.1" physx-body="type: static"
-                 physx-material="staticFriction: 0; dynamicFriction: 0; restitution: 1">
+                 physx-material="staticFriction: 0; dynamicFriction: 0; restitution: 0">
           </a-box>
           <a-box position="0 0 0.15" width="1" height="0.1" depth="1" physx-body="type: static"
                  physx-material="staticFriction: 0; dynamicFriction: 0; restitution: 1">
